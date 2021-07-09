@@ -14,6 +14,8 @@ const Home = () => {
   const history = useHistory();
   const [midi, setMidi] = useState(null);
   const [fileName, setFileName] = useState("ファイルが未選択です");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const iconStyle = { fontSize: "10vw" };
 
   console.log(midi);
@@ -29,40 +31,57 @@ const Home = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!midi) {
-      alert("ファイルを入力してください");
-      return;
-    }
 
     const formData = new FormData();
     formData.append("midi", midi);
 
-    const res = await fetch(API_ENDPOINT, {
-      method: "POST",
-      body: formData,
-    });
+    let res;
+    try {
+      res = await fetch(API_ENDPOINT, {
+        method: "POST",
+        body: formData,
+      });
 
-    const blob = await res.blob();
-    const reader = new FileReader();
+      const blob = await res.blob();
+      const reader = new FileReader();
 
-    // base64 encode
-    reader.readAsDataURL(blob);
-    reader.onload = (e) => {
-      const mp3Data = e.target.result;
-      if (mp3Data) {
-        dispatch(setMp3(mp3Data));
-        dispatch(setDownloadUrl(URL.createObjectURL(blob)));
-        history.push("/player");
-      }
-    };
-    reader.onerror = (err) => {
-      console.error(err);
-    };
+      // base64 encode
+      reader.readAsDataURL(blob);
+      reader.onload = (e) => {
+        const mp3Data = e.target.result;
+        if (mp3Data) {
+          dispatch(setMp3(mp3Data));
+          dispatch(setDownloadUrl(URL.createObjectURL(blob)));
+          history.push("/player");
+        }
+      };
+      reader.onerror = (err) => {
+        console.error(err);
+        setErrorMessage("変換に失敗しました、ごめんなさい。");
+      };
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("変換に失敗しました、ごめんなさい。");
+      return;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div>
-      <div className="hero is-small pt-5">
+      <div class={`modal ${errorMessage ? "is-active" : ""}`}>
+        <div class="modal-background" onClick={() => setErrorMessage("")} />
+        <div class="modal-content" onClick={() => setErrorMessage("")}>
+          <div class="notification is-danger">{errorMessage}</div>
+        </div>
+        {/* <button
+          class="modal-close is-large"
+          onClick={() => setErrorMessage("")}
+        /> */}
+      </div>
+
+      <div className="hero is-small pt-6">
         <div className="hero-body has-text-centered">
           <h1 className="title">絶対音感を体験できるアプリ</h1>
           <h2 className="subtitle">
@@ -72,14 +91,14 @@ const Home = () => {
         </div>
       </div>
       <div className="section">
-        <div className="container pb-6">
+        <div className="container py-6">
           <div className="is-flex is-justify-content-space-around is-align-items-center">
             <img src={MidiIcon} width="30%" alt="midiファイルのアイコン" />
             <FontAwesomeIcon icon={faArrowRight} style={iconStyle} />
             <img src={Mp3Icon} width="30%" alt="mp3ファイルのアイコン" />
           </div>
         </div>
-        <form className="pt-6 has-text-centered" onSubmit={handleSubmit}>
+        <form className="has-text-centered" onSubmit={handleSubmit}>
           <div className="field py-5">
             <div className="file is-centered is-boxed  has-name">
               <label className="file-label">
@@ -88,6 +107,7 @@ const Home = () => {
                   type="file"
                   name="resume"
                   onChange={handleChange}
+                  accept="audio/midi, audio/x-midi"
                 />
                 <span className="file-cta">
                   <span className="file-icon">
@@ -100,40 +120,17 @@ const Home = () => {
             </div>
           </div>
           <div className="field py-5">
-            <button className="button is-info is-outlined">変換</button>
+            <button
+              className={`button is-info is-medium is-rounded ${
+                isLoading && "is-loading"
+              }`}
+              disabled={!midi}
+              onClick={() => setIsLoading(true)}
+            >
+              変換
+            </button>
           </div>
         </form>
-        {/* 
-      <form onSubmit={handleSubmit}>
-        <div className="ion-text-center">
-          <label style={{ width: "100%", height: "100%" }}>
-            <IonIcon
-              icon={shareOutline}
-              style={{ fontSize: "62px" }}
-              size="large"
-            />
-
-            <IonInput
-              name="midi"
-              type="file"
-              accept="audio/midi, audio/x-midi"
-              id="hello"
-              style={{ display: "none" }}
-            />
-          </label>
-        </div>
-
-        <IonButton
-          type="submit"
-          fill="outline"
-          expand="block"
-          shape="round"
-          size="large"
-          style={{ padding: "0 50px" }}
-        >
-          <IonText color="dark">変換</IonText>
-        </IonButton>
-      </form> */}
       </div>
     </div>
   );
