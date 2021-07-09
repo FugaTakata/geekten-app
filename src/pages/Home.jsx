@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useLocation } from "react-router";
-import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { API_ENDPOINT } from "../const/api";
 import { setDownloadUrl, setMp3 } from "../modules/slice";
@@ -14,10 +12,10 @@ import {
   faUpload,
   faChevronLeft,
 } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const location = useLocation();
   const [midi, setMidi] = useState(null);
   const [fileName, setFileName] = useState("ファイルが未選択です");
   const iconStyle = { fontSize: "10vw" };
