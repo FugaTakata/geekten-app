@@ -18,8 +18,6 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const iconStyle = { fontSize: "10vw" };
 
-  console.log(midi);
-
   const handleChange = (e) => {
     const file = e.target.files[0];
 
@@ -70,13 +68,13 @@ const Home = () => {
 
   return (
     <div>
-      <div class={`modal ${errorMessage ? "is-active" : ""}`}>
-        <div class="modal-background" onClick={() => setErrorMessage("")} />
-        <div class="modal-content" onClick={() => setErrorMessage("")}>
-          <div class="notification is-danger">{errorMessage}</div>
+      <div className={`modal ${errorMessage ? "is-active" : ""}`}>
+        <div className="modal-background" onClick={() => setErrorMessage("")} />
+        <div className="modal-content" onClick={() => setErrorMessage("")}>
+          <div className="notification is-danger">{errorMessage}</div>
         </div>
         {/* <button
-          class="modal-close is-large"
+          className="modal-close is-large"
           onClick={() => setErrorMessage("")}
         /> */}
       </div>
