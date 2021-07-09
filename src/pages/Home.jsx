@@ -3,19 +3,15 @@ import { useDispatch } from "react-redux";
 import { API_ENDPOINT } from "../const/api";
 import { setDownloadUrl, setMp3 } from "../modules/slice";
 
-// import { arrowForwardOutline, share, shareOutline } from "ionicons/icons";
 import MidiIcon from "../images/midi_icon.png";
 import Mp3Icon from "../images/mp3_icon.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowRight,
-  faUpload,
-  faChevronLeft,
-} from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { faArrowRight, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { useHistory } from "react-router";
 
 const Home = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
   const [midi, setMidi] = useState(null);
   const [fileName, setFileName] = useState("ファイルが未選択です");
   const iconStyle = { fontSize: "10vw" };
@@ -33,15 +29,13 @@ const Home = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const file = e.target.midi.files[0];
-
-    if (!file) {
+    if (!midi) {
       alert("ファイルを入力してください");
       return;
     }
 
     const formData = new FormData();
-    formData.append("midi", file);
+    formData.append("midi", midi);
 
     const res = await fetch(API_ENDPOINT, {
       method: "POST",
@@ -58,6 +52,7 @@ const Home = () => {
       if (mp3Data) {
         dispatch(setMp3(mp3Data));
         dispatch(setDownloadUrl(URL.createObjectURL(blob)));
+        history.push("/player");
       }
     };
     reader.onerror = (err) => {
@@ -67,7 +62,7 @@ const Home = () => {
 
   return (
     <div>
-      <div className="hero is-small">
+      <div className="hero is-small pt-5">
         <div className="hero-body has-text-centered">
           <h1 className="title">絶対音感を体験できるアプリ</h1>
           <h2 className="subtitle">
@@ -77,15 +72,14 @@ const Home = () => {
         </div>
       </div>
       <div className="section">
-        <div className="container py-6">
+        <div className="container pb-6">
           <div className="is-flex is-justify-content-space-around is-align-items-center">
             <img src={MidiIcon} width="30%" alt="midiファイルのアイコン" />
-            {/* <IonIcon icon={arrowForwardOutline} size="large" /> */}
             <FontAwesomeIcon icon={faArrowRight} style={iconStyle} />
             <img src={Mp3Icon} width="30%" alt="mp3ファイルのアイコン" />
           </div>
         </div>
-        <form className="pt-6 has-text-centered">
+        <form className="pt-6 has-text-centered" onSubmit={handleSubmit}>
           <div className="field py-5">
             <div className="file is-centered is-boxed  has-name">
               <label className="file-label">
