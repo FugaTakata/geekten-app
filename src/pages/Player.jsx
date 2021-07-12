@@ -44,23 +44,27 @@ const Player = () => {
             </div>
           </div>
           <div className="field has-addons py-4">
-            <input
-              className="input"
-              type="text"
-              placeholder="wavファイル名"
-              // ref={fileNameRef}
-              onChange={(e) => setFileName(e.target.value)}
-              value={fileName}
-            />
-            <a
-              className="button is-info is-outlined is-round"
-              // onClick={(e) => console.log(fileNameRef.current.value)}
-              // download={getValidFileName(fileNameRef.current.value)}
-              download={getValidFileName(fileName)}
-              href={downloadUrl}
-            >
-              download
-            </a>
+            <div className="control is-expanded">
+              <input
+                className="input"
+                type="text"
+                placeholder="wavファイル名"
+                // ref={fileNameRef}
+                onChange={(e) => setFileName(e.target.value)}
+                value={fileName}
+              />
+            </div>
+            <div className="control">
+              <a
+                className="button is-info is-outlined is-round"
+                // onClick={(e) => console.log(fileNameRef.current.value)}
+                // download={getValidFileName(fileNameRef.current.value)}
+                download={getValidFileName(fileName)}
+                href={downloadUrl}
+              >
+                download
+              </a>
+            </div>
           </div>
         </div>
         <div className="container">
