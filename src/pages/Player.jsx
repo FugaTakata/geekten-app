@@ -10,7 +10,6 @@ const Player = () => {
   // const mp3 = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
   const iconStyle = { fontSize: "10vw" };
   const { mp3, downloadUrl } = useSelector((state) => state.app);
-  // const fileNameRef = useRef("");
   const [fileName, setFileName] = useState("");
 
   const getValidFileName = (input) => {

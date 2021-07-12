@@ -41,7 +41,8 @@ const Home = () => {
         body: formData,
       });
 
-      const blob = await res.blob();
+      // const blob = await res.blob();
+      const blob = await res.blob({ type: "audio/wav" });
       const reader = new FileReader();
 
       // base64 encode
