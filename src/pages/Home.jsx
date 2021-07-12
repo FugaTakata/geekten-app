@@ -6,7 +6,11 @@ import { setDownloadUrl, setMp3 } from "../modules/slice";
 import MidiIcon from "../images/midi_icon.png";
 import Mp3Icon from "../images/mp3_icon.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faUpload } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowRight,
+  faUpload,
+  faEnvelope,
+} from "@fortawesome/free-solid-svg-icons";
 import { useHistory } from "react-router";
 
 const Home = () => {
@@ -14,11 +18,13 @@ const Home = () => {
   const history = useHistory();
   const [midi, setMidi] = useState(null);
   const [fileName, setFileName] = useState("ファイルが未選択です");
-  const [errorMessage, setErrorMessage] = useState("");
+  const initialMessage = { type: null, text: "" };
+  const [message, setMessage] = useState(initialMessage);
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const iconStyle = { fontSize: "10vw" };
 
-  const handleChange = (e) => {
+  const handleChangeFile = (e) => {
     const file = e.target.files[0];
 
     if (file) {
@@ -27,39 +33,70 @@ const Home = () => {
     }
   };
 
+  const handleChangeEmail = (e) => {
+    setEmail(e.target.value);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("midi", midi);
-
-    let res;
     try {
-      res = await fetch(API_ENDPOINT, {
+      if (!email.match(/[^\s]+@[^\s]+/)) {
+        setMessage({
+          type: "danger",
+          text: "有効なメールアドレスを入力してください。",
+        });
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("midi", midi);
+      formData.append("email", email);
+
+      const res = await fetch(API_ENDPOINT, {
         method: "POST",
         body: formData,
       });
 
-      const blob = await res.blob();
-      const reader = new FileReader();
+      if (res.ok) {
+        setMessage({
+          type: "success",
+          text: "生成結果の送信をお待ちください。",
+        });
+      } else {
+        setMessage({
+          type: "danger",
+          text: "変換に失敗しました、ごめんなさい。",
+        });
+        return;
+      }
 
-      // base64 encode
-      reader.readAsDataURL(blob);
-      reader.onload = (e) => {
-        const mp3Data = e.target.result;
-        if (mp3Data) {
-          dispatch(setMp3(mp3Data));
-          dispatch(setDownloadUrl(URL.createObjectURL(blob)));
-          history.push("/player");
-        }
-      };
-      reader.onerror = (err) => {
-        console.error(err);
-        setErrorMessage("変換に失敗しました、ごめんなさい。");
-      };
+      // const blob = await res.blob();
+      // const reader = new FileReader();
+
+      // // base64 encode
+      // reader.readAsDataURL(blob);
+      // reader.onload = (e) => {
+      //   const mp3Data = e.target.result;
+      //   if (mp3Data) {
+      //     dispatch(setMp3(mp3Data));
+      //     dispatch(setDownloadUrl(URL.createObjectURL(blob)));
+      //     history.push("/player");
+      //   }
+      // };
+      // reader.onerror = (err) => {
+      //   console.error(err);
+      //   setMessage({
+      //     type: "danger",
+      //     text: "変換に失敗しました、ごめんなさい。",
+      //   });
+      // };
     } catch (error) {
       console.error(error);
-      setErrorMessage("変換に失敗しました、ごめんなさい。");
+      setMessage({
+        type: "danger",
+        text: "変換に失敗しました、ごめんなさい。",
+      });
       return;
     } finally {
       setIsLoading(false);
@@ -68,15 +105,16 @@ const Home = () => {
 
   return (
     <div>
-      <div className={`modal ${errorMessage ? "is-active" : ""}`}>
-        <div className="modal-background" onClick={() => setErrorMessage("")} />
-        <div className="modal-content" onClick={() => setErrorMessage("")}>
-          <div className="notification is-danger">{errorMessage}</div>
+      <div className={`modal ${message.text ? "is-active" : ""}`}>
+        <div
+          className="modal-background"
+          onClick={() => setMessage(initialMessage)}
+        />
+        <div className="modal-content">
+          <div className={`notification is-${message.type}`}>
+            {message.text}
+          </div>
         </div>
-        {/* <button
-          className="modal-close is-large"
-          onClick={() => setErrorMessage("")}
-        /> */}
       </div>
 
       <div className="hero is-small pt-6">
@@ -96,7 +134,7 @@ const Home = () => {
             <img src={Mp3Icon} width="30%" alt="mp3ファイルのアイコン" />
           </div>
         </div>
-        <form className="has-text-centered" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="has-text-centered">
           <div className="field py-5">
             <div className="file is-centered is-boxed  has-name">
               <label className="file-label">
@@ -104,7 +142,7 @@ const Home = () => {
                   className="file-input"
                   type="file"
                   name="resume"
-                  onChange={handleChange}
+                  onChange={handleChangeFile}
                   accept="audio/midi, audio/x-midi"
                 />
                 <span className="file-cta">
@@ -117,12 +155,33 @@ const Home = () => {
               </label>
             </div>
           </div>
+          <div className="columns is-centered">
+            <div className="column is-4">
+              <div className="field is-one-quarter">
+                <label className="label has-text-left">
+                  送信先メールアドレス
+                </label>
+                <div className="control has-icons-left">
+                  <input
+                    className="input"
+                    // type="email"
+                    type="text"
+                    placeholder="example@mail.com"
+                    onChange={handleChangeEmail}
+                  />
+                  <span className="icon is-small is-left">
+                    <FontAwesomeIcon icon={faEnvelope} />
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="field py-5">
             <button
               className={`button is-info is-medium is-rounded ${
                 isLoading && "is-loading"
               }`}
-              disabled={!midi}
+              disabled={!midi || !email}
               onClick={() => setIsLoading(true)}
             >
               変換
