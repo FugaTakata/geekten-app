@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+// import { useDispatch } from "react-redux";
 import { API_ENDPOINT } from "../const/api";
-import { setDownloadUrl, setMp3 } from "../modules/slice";
+// import { setDownloadUrl, setMp3 } from "../modules/slice";
 
 import MidiIcon from "../images/midi_icon.png";
 import Mp3Icon from "../images/mp3_icon.png";
@@ -11,23 +11,28 @@ import {
   faUpload,
   faEnvelope,
 } from "@fortawesome/free-solid-svg-icons";
-import { useHistory } from "react-router";
+// import { useHistory } from "react-router";
 
 const Home = () => {
-  const dispatch = useDispatch();
-  const history = useHistory();
-  const [midi, setMidi] = useState(null);
-  const [fileName, setFileName] = useState("ファイルが未選択です");
+  // const dispatch = useDispatch();
+  // const history = useHistory();
+  const initialMidi = void 0;
+  const initialFileName = "ファイルが未選択です";
   const initialMessage = { type: null, text: "" };
+  const initialEmail = "";
+
+  const [midi, setMidi] = useState(initialMidi);
+  const [fileName, setFileName] = useState(initialFileName);
   const [message, setMessage] = useState(initialMessage);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail);
   const [isLoading, setIsLoading] = useState(false);
+
   const iconStyle = { fontSize: "10vw" };
 
   const resetFormState = () => {
-    setEmail("");
-    setMidi(null);
-    setFileName("");
+    setEmail(initialEmail);
+    setMidi(initialMidi);
+    setFileName(initialFileName);
   };
 
   const handleChangeFile = (e) => {
@@ -47,7 +52,11 @@ const Home = () => {
     e.preventDefault();
 
     try {
-      if (!email.match(/[^\s]+@[^\s]+/)) {
+      if (
+        !email.match(
+          /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+        )
+      ) {
         setMessage({
           type: "danger",
           text: "有効なメールアドレスを入力してください。",
@@ -171,10 +180,9 @@ const Home = () => {
                 <div className="control has-icons-left">
                   <input
                     className="input"
-                    // type="email"
-                    type="text"
                     placeholder="example@mail.com"
                     onChange={handleChangeEmail}
+                    value={email}
                   />
                   <span className="icon is-small is-left">
                     <FontAwesomeIcon icon={faEnvelope} />
