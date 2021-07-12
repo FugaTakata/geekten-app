@@ -16,7 +16,7 @@ const Player = () => {
   const getValidFileName = (input) => {
     return (
       (input.replaceAll(".", "") ? input.replaceAll(".", "") : "zettai-onkan") +
-      ".mp3"
+      ".wav"
     );
   };
 
@@ -47,7 +47,7 @@ const Player = () => {
             <input
               className="input"
               type="text"
-              placeholder="mp3ファイル名"
+              placeholder="wavファイル名"
               // ref={fileNameRef}
               onChange={(e) => setFileName(e.target.value)}
               value={fileName}
