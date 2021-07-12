@@ -4,7 +4,8 @@ import { API_ENDPOINT } from "../const/api";
 import { setDownloadUrl, setMp3 } from "../modules/slice";
 
 import MidiIcon from "../images/midi_icon.png";
-import Mp3Icon from "../images/mp3_icon.png";
+import WavIcon from "../images/wav_icon.png";
+// import Mp3Icon from "../images/mp3_icon.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { useHistory } from "react-router";
@@ -93,7 +94,8 @@ const Home = () => {
           <div className="is-flex is-justify-content-space-around is-align-items-center">
             <img src={MidiIcon} width="30%" alt="midiファイルのアイコン" />
             <FontAwesomeIcon icon={faArrowRight} style={iconStyle} />
-            <img src={Mp3Icon} width="30%" alt="mp3ファイルのアイコン" />
+            {/* <img src={Mp3Icon} width="30%" alt="mp3ファイルのアイコン" /> */}
+            <img src={WavIcon} width="30%" alt="wavファイルのアイコン" />
           </div>
         </div>
         <form className="has-text-centered" onSubmit={handleSubmit}>
