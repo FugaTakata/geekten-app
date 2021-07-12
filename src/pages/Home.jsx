@@ -24,6 +24,12 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const iconStyle = { fontSize: "10vw" };
 
+  const resetFormState = () => {
+    setEmail("");
+    setMidi(null);
+    setFileName("");
+  };
+
   const handleChangeFile = (e) => {
     const file = e.target.files[0];
 
@@ -63,6 +69,7 @@ const Home = () => {
           type: "success",
           text: "生成結果の送信をお待ちください。",
         });
+        resetFormState();
       } else {
         setMessage({
           type: "danger",
