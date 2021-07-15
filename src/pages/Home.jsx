@@ -30,6 +30,18 @@ const Home = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(midi);
+    if (
+      !["audio/mid", "audio/midi", "audio/x-midi"].includes(
+        midi.type.toLowerCase()
+      )
+    ) {
+      setErrorMessage("MIDIファイルを選択して下さい。");
+      setMidi(void 0);
+      setFileName("ファイルが未選択です。");
+      setIsLoading(false);
+      return;
+    }
 
     const formData = new FormData();
     formData.append("midi", midi);
@@ -40,10 +52,14 @@ const Home = () => {
         method: "POST",
         body: formData,
       });
-
+      if (!res.ok) {
+        setErrorMessage("変換に失敗しました、ごめんなさい。");
+        return;
+      }
       // const blob = await res.blob();
-      const blob = await res.blob({ type: "audio/wav" });
+      const blob = await res.blob();
       const reader = new FileReader();
+      // console.log(blob);
 
       // base64 encode
       reader.readAsDataURL(blob);
@@ -60,7 +76,7 @@ const Home = () => {
         setErrorMessage("変換に失敗しました、ごめんなさい。");
       };
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       setErrorMessage("変換に失敗しました、ごめんなさい。");
       return;
     } finally {
