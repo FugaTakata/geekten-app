@@ -5,11 +5,10 @@ import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "react-h5-audio-player/lib/styles.css";
 import { useSelector } from "react-redux";
-import Div100vh from "react-div-100vh";
 
 const Player = () => {
   // const mp3 = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
-  const iconStyle = { fontSize: "10vw" };
+  const iconStyle = { fontSize: "3em" };
   const { mp3, downloadUrl } = useSelector((state) => state.app);
   const [fileName, setFileName] = useState("");
 
@@ -21,8 +20,7 @@ const Player = () => {
   };
 
   return (
-    <Div100vh>
-      {" "}
+    <div>
       <header>
         <nav className="navbar" role="navigation">
           <div className="navbar-brand">
@@ -49,7 +47,7 @@ const Player = () => {
               <input
                 className="input"
                 type="text"
-                placeholder="wavファイル名"
+                placeholder="ファイル名を入力"
                 // ref={fileNameRef}
                 onChange={(e) => setFileName(e.target.value)}
                 value={fileName}
@@ -79,7 +77,7 @@ const Player = () => {
           />
         </div>
       </div>
-    </Div100vh>
+    </div>
   );
 };
 
