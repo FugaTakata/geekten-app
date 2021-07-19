@@ -5,6 +5,7 @@ import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "react-h5-audio-player/lib/styles.css";
 import { useSelector } from "react-redux";
+import Div100vh from "react-div-100vh";
 
 const Player = () => {
   // const mp3 = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
@@ -20,7 +21,8 @@ const Player = () => {
   };
 
   return (
-    <div>
+    <Div100vh>
+      {" "}
       <header>
         <nav className="navbar" role="navigation">
           <div className="navbar-brand">
@@ -77,7 +79,7 @@ const Player = () => {
           />
         </div>
       </div>
-    </div>
+    </Div100vh>
   );
 };
 
