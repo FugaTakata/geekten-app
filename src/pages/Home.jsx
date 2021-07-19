@@ -9,6 +9,7 @@ import WavIcon from "../images/wav_icon.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { useHistory } from "react-router";
+import Div100vh from "react-div-100vh";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -30,7 +31,6 @@ const Home = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(midi);
     if (
       !["audio/mid", "audio/midi", "audio/x-midi"].includes(
         midi.type.toLowerCase()
@@ -56,10 +56,8 @@ const Home = () => {
         setErrorMessage("変換に失敗しました、ごめんなさい。");
         return;
       }
-      // const blob = await res.blob();
       const blob = await res.blob();
       const reader = new FileReader();
-      // console.log(blob);
 
       // base64 encode
       reader.readAsDataURL(blob);
@@ -76,7 +74,6 @@ const Home = () => {
         setErrorMessage("変換に失敗しました、ごめんなさい。");
       };
     } catch (error) {
-      // console.error(error);
       setErrorMessage("変換に失敗しました、ごめんなさい。");
       return;
     } finally {
@@ -85,7 +82,7 @@ const Home = () => {
   };
 
   return (
-    <div>
+    <Div100vh>
       <div className={`modal ${errorMessage ? "is-active" : ""}`}>
         <div className="modal-background" onClick={() => setErrorMessage("")} />
         <div className="modal-content" onClick={() => setErrorMessage("")}>
@@ -138,7 +135,7 @@ const Home = () => {
           </div>
           <div className="field py-5">
             <button
-              className={`button is-info is-medium is-rounded ${
+              className={`button is-info is-large is-rounded ${
                 isLoading && "is-loading"
               }`}
               disabled={!midi}
@@ -149,7 +146,7 @@ const Home = () => {
           </div>
         </form>
       </div>
-    </div>
+    </Div100vh>
   );
 };
 
