@@ -142,9 +142,8 @@ const Home = () => {
   const handleChangeEmail = (e) => {
     setEmail(e.target.value);
   };
-
   return (
-    <div>
+    <>
       <section className="hero is-primary">
         <div className="hero-head">
           <nav className="navbar">
@@ -178,7 +177,6 @@ const Home = () => {
           <div className="is-flex is-justify-content-space-around is-align-items-center">
             <img src={MidiIcon} width="25%" alt="midiファイルのアイコン" />
             <FontAwesomeIcon icon={faArrowRight} style={iconStyle} />
-            {/* <img src={Mp3Icon} width="30%" alt="mp3ファイルのアイコン" /> */}
             <img src={WavIcon} width="25%" alt="wavファイルのアイコン" />
           </div>
         </div>
@@ -272,7 +270,7 @@ const Home = () => {
                     </div>
                   </div>
                 </div>
-                <div className="field py-5">
+                <div className="field py-6 has-text-centered">
                   <button
                     className={`button is-info is-large is-rounded ${
                       isLoading && "is-loading"
@@ -288,7 +286,7 @@ const Home = () => {
           }
         })()}
       </div>
-    </div>
+    </>
   );
 };
 
