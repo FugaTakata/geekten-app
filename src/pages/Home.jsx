@@ -7,19 +7,26 @@ import WavIcon from "../images/wav_icon.png";
 import Title from "../images/title_logo.png";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faUpload } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowRight,
+  faUpload,
+  faEnvelope,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Home = () => {
   const [midi, setMidi] = useState(null);
   const [uploadFileName, setUploadFileName] = useState("ファイルが未選択です");
   const [downloadFileName, setDownloadFileName] = useState("");
   const [downloadUrl, setDownloadUrl] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [mp3Data, setMp3Data] = useState(null);
+  const [email, setEmail] = useState("");
+
   const iconStyle = { fontSize: "10vw" };
 
-  const handleChange = (e) => {
+  const handleChangeFile = (e) => {
     const file = e.target.files[0];
 
     if (file) {
@@ -28,6 +35,7 @@ const Home = () => {
     }
   };
 
+  let res;
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (
@@ -41,33 +49,52 @@ const Home = () => {
       setIsLoading(false);
       return;
     }
-
-    const formData = new FormData();
-    formData.append("midi", midi);
-
-    let res;
     try {
+      if (
+        !email.match(
+          /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+        ) &&
+        email !== ""
+      ) {
+        setErrorMessage("有効なメールアドレスを入力してください。");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("midi", midi);
+      if (email === "") {
+        formData.append("email", null);
+        console.log("ok");
+      } else {
+        formData.append("email", email);
+      }
+
       res = await fetch(API_ENDPOINT, {
         method: "POST",
         body: formData,
       });
+
       if (!res.ok) {
         setErrorMessage("変換に失敗しました、ごめんなさい。");
         return;
-      }
-      const blob = await res.blob();
-      const reader = new FileReader();
+      } else if (email !== "") {
+        setSuccessMessage("生成結果の送信をお待ちください。");
+        resetFormState();
+      } else {
+        const blob = await res.blob();
+        const reader = new FileReader();
 
-      // base64 encode
-      reader.readAsDataURL(blob);
-      reader.onload = (e) => {
-        setMp3Data(e.target.result);
-        setDownloadUrl(URL.createObjectURL(blob));
-      };
-      reader.onerror = (err) => {
-        console.error(err);
-        setErrorMessage("変換に失敗しました、ごめんなさい。");
-      };
+        // base64 encode
+        reader.readAsDataURL(blob);
+        reader.onload = (e) => {
+          setMp3Data(e.target.result);
+          setDownloadUrl(URL.createObjectURL(blob));
+        };
+        reader.onerror = (err) => {
+          console.error(err);
+          setErrorMessage("変換に失敗しました、ごめんなさい。");
+        };
+      }
     } catch (error) {
       setErrorMessage("変換に失敗しました、ごめんなさい。");
       return;
@@ -76,14 +103,14 @@ const Home = () => {
     }
   };
 
-  const handleReset = () => {
+  const resetFormState = () => {
     setMidi(null);
     setUploadFileName("ファイルが未選択です");
     setDownloadFileName("");
     setDownloadUrl("");
-    // setErrorMessage("");
     setIsLoading(false);
     setMp3Data(null);
+    setEmail("");
   };
 
   const getValidFileName = (input) => {
@@ -91,6 +118,10 @@ const Home = () => {
       (input.replaceAll(".", "") ? input.replaceAll(".", "") : "zettai_onkan") +
       ".wav"
     );
+  };
+
+  const handleChangeEmail = (e) => {
+    setEmail(e.target.value);
   };
 
   return (
@@ -112,6 +143,19 @@ const Home = () => {
           onClick={() => setErrorMessage("")}
         /> */}
       </div>
+      <div className={`modal ${successMessage ? "is-active" : ""}`}>
+        <div
+          className="modal-background"
+          onClick={() => setSuccessMessage("")}
+        />
+        <div className="modal-content" onClick={() => setSuccessMessage("")}>
+          <div className="notification is-success">{successMessage}</div>
+        </div>
+        {/* <button
+          className="modal-close is-large"
+          onClick={() => setErrorMessage("")}
+        /> */}
+      </div>
 
       <div className="hero is-small pt-6">
         <div className="hero-body has-text-centered">
@@ -125,10 +169,10 @@ const Home = () => {
       <div className="section">
         <div className="container py-6">
           <div className="is-flex is-justify-content-space-around is-align-items-center">
-            <img src={MidiIcon} width="30%" alt="midiファイルのアイコン" />
+            <img src={MidiIcon} width="25%" alt="midiファイルのアイコン" />
             <FontAwesomeIcon icon={faArrowRight} style={iconStyle} />
             {/* <img src={Mp3Icon} width="30%" alt="mp3ファイルのアイコン" /> */}
-            <img src={WavIcon} width="30%" alt="wavファイルのアイコン" />
+            <img src={WavIcon} width="25%" alt="wavファイルのアイコン" />
           </div>
         </div>
 
@@ -171,7 +215,7 @@ const Home = () => {
                 <div className="field py-6 has-text-centered">
                   <button
                     className="button is-info is-large is-rounded"
-                    onClick={handleReset}
+                    onClick={resetFormState}
                   >
                     続けて変換
                   </button>
@@ -182,13 +226,13 @@ const Home = () => {
             return (
               <form className="has-text-centered" onSubmit={handleSubmit}>
                 <div className="field py-5">
-                  <div className="file is-centered is-boxed  has-name">
+                  <div className="file is-centered is-boxed has-name">
                     <label className="file-label">
                       <input
                         className="file-input"
                         type="file"
                         name="resume"
-                        onChange={handleChange}
+                        onChange={handleChangeFile}
                         accept="audio/midi, audio/x-midi"
                       />
                       <span className="file-cta">
@@ -199,6 +243,26 @@ const Home = () => {
                       </span>
                       <span className="file-name">{uploadFileName}</span>
                     </label>
+                  </div>
+                </div>
+                <div className="columns is-centered">
+                  <div className="column is-4">
+                    <div className="field is-one-quarter">
+                      <label className="label has-text-left">
+                        送信先メールアドレス
+                      </label>
+                      <div className="control has-icons-left">
+                        <input
+                          className="input"
+                          placeholder="example@mail.com"
+                          onChange={handleChangeEmail}
+                          value={email}
+                        />
+                        <span className="icon is-small is-left">
+                          <FontAwesomeIcon icon={faEnvelope} />
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="field py-5">
