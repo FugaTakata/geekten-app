@@ -14,12 +14,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const Home = () => {
+  const initialMessage = { type: null, text: "" };
+
   const [midi, setMidi] = useState(null);
   const [uploadFileName, setUploadFileName] = useState("ファイルが未選択です");
   const [downloadFileName, setDownloadFileName] = useState("");
   const [downloadUrl, setDownloadUrl] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [message, setMessage] = useState(initialMessage);
   const [isLoading, setIsLoading] = useState(false);
   const [mp3Data, setMp3Data] = useState(null);
   const [email, setEmail] = useState("");
@@ -43,7 +44,10 @@ const Home = () => {
         midi.type.toLowerCase()
       )
     ) {
-      setErrorMessage("MIDIファイルを選択して下さい。");
+      setMessage({
+        type: "danger",
+        text: "MIDIファイルを選択して下さい。",
+      });
       setMidi(void 0);
       setUploadFileName("ファイルが未選択です。");
       setIsLoading(false);
@@ -56,7 +60,10 @@ const Home = () => {
         ) &&
         email !== ""
       ) {
-        setErrorMessage("有効なメールアドレスを入力してください。");
+        setMessage({
+          type: "danger",
+          text: "有効なメールアドレスを入力してください。",
+        });
         return;
       }
 
@@ -75,10 +82,16 @@ const Home = () => {
       });
 
       if (!res.ok) {
-        setErrorMessage("変換に失敗しました、ごめんなさい。");
+        setMessage({
+          type: "danger",
+          text: "変換に失敗しました、ごめんなさい。",
+        });
         return;
       } else if (email !== "") {
-        setSuccessMessage("生成結果の送信をお待ちください。");
+        setMessage({
+          type: "success",
+          text: "生成結果の送信をお待ちください。",
+        });
         resetFormState();
       } else {
         const blob = await res.blob();
@@ -92,11 +105,17 @@ const Home = () => {
         };
         reader.onerror = (err) => {
           console.error(err);
-          setErrorMessage("変換に失敗しました、ごめんなさい。");
+          setMessage({
+            type: "danger",
+            text: "変換に失敗しました、ごめんなさい。",
+          });
         };
       }
     } catch (error) {
-      setErrorMessage("変換に失敗しました、ごめんなさい。");
+      setMessage({
+        type: "danger",
+        text: "変換に失敗しました、ごめんなさい。",
+      });
       return;
     } finally {
       setIsLoading(false);
@@ -133,28 +152,16 @@ const Home = () => {
           </nav>
         </div>
       </section>
-      <div className={`modal ${errorMessage ? "is-active" : ""}`}>
-        <div className="modal-background" onClick={() => setErrorMessage("")} />
-        <div className="modal-content" onClick={() => setErrorMessage("")}>
-          <div className="notification is-danger">{errorMessage}</div>
-        </div>
-        {/* <button
-          className="modal-close is-large"
-          onClick={() => setErrorMessage("")}
-        /> */}
-      </div>
-      <div className={`modal ${successMessage ? "is-active" : ""}`}>
+      <div className={`modal ${message.text ? "is-active" : ""}`}>
         <div
           className="modal-background"
-          onClick={() => setSuccessMessage("")}
+          onClick={() => setMessage(initialMessage)}
         />
-        <div className="modal-content" onClick={() => setSuccessMessage("")}>
-          <div className="notification is-success">{successMessage}</div>
+        <div className="modal-content">
+          <div className={`notification is-${message.type}`}>
+            {message.text}
+          </div>
         </div>
-        {/* <button
-          className="modal-close is-large"
-          onClick={() => setErrorMessage("")}
-        /> */}
       </div>
 
       <div className="hero is-small pt-6">
