@@ -71,15 +71,15 @@ const Home = () => {
       formData.append("midi", midi);
       if (email === "") {
         formData.append("email", null);
-        console.log("ok");
       } else {
         formData.append("email", email);
       }
 
-      res = await fetch(API_ENDPOINT, {
+      res = await fetch(`${API_ENDPOINT}${email !== "" ? "mail" : ""}`, {
         method: "POST",
         body: formData,
       });
+      // console.log(`${API_ENDPOINT}${email !== "" ? "mail" : ""}`);
 
       if (!res.ok) {
         setMessage({
